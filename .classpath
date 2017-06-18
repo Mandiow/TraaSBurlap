@@ -2,8 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/burlap-3.0.1-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/burlap-3.0.1-jar-with-dependencies.jar" sourcepath="C:/Users/Mandiow/Documents/SUMOTRACI/burlap-master"/>
 	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/TraaS_javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/TraaS_sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/FreeChart/lib/jfreesvg-2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/FreeChart/lib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/FreeChart/lib/orsoncharts-1.4-eval-nofx.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/FreeChart/lib/orsonpdf-1.6-eval.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/FreeChart/lib/servlet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mandiow/workspace/TrasS Example/dependency/FreeChart/lib/swtgraphics2d.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

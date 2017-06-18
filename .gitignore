@@ -1,2 +1,6 @@
 bin/
+output/
+*.txt
 *.png
+*.csv
+src/com/example/BasicBehavior.java
