@@ -94,7 +94,7 @@ public class BurlapTraci {
 		return env;
 	}
 
-	public QLearningTL createAgent(){
+	public QLearningTL createAgent(double gamma,double qInit,double learningRate){
 		generateEnvironment();
     	return new QLearningTL(domain, 0.99, hashingFactory, 0., 1.);
     }

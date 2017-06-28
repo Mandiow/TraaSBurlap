@@ -32,7 +32,7 @@ public class Main extends JPanel {
  
     static String sumo_bin = "c:/Program Files (x86)/DLR/Sumo/bin/sumo-gui.exe";
     static String config_file = "c:/Users/Mandiow/Documents/SUMOTRACI/3x3Grid/3x3GridHalfRandom.sumocfg";
-    static int duration = 360000;
+    static int duration = 259200;
 	
     public static void main(String[] args) {
     	//
@@ -41,6 +41,11 @@ public class Main extends JPanel {
         int lastStoppedCars = 0;
         double nsOcc;
         double weOcc;
+        double gamma = 0.8;
+        double learningRate = 1.;
+        double qInit = 0.;
+        double epsilon = 0.7;
+        
     	//The user needs to pass their configuration, sumo path and duration
 //        if(args.length > 3 || args.length < 3)
 //        	return ;
@@ -50,8 +55,8 @@ public class Main extends JPanel {
 //		duration = Integer.parseInt(args[2]);
     	PrintWriter writer = null;
     	try {
-			writer = new PrintWriter("rng.csv", "UTF-8");
-			writer.println("Time,Queue");
+			writer = new PrintWriter("aes.csv", "UTF-8");
+			//writer.println("Time,Queue");
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e1) {
@@ -64,9 +69,9 @@ public class Main extends JPanel {
         SumoTraciConnection conn = new SumoTraciConnection(sumo_bin, config_file);
         //set some options
         conn.addOption("step-length", "1"); //timestep 1 second
-        QLearningTL agent = bT.createAgent();
+        QLearningTL agent = bT.createAgent(gamma,qInit,learningRate);
         EpsilonGreedy p = (EpsilonGreedy) agent.getLearningPolicy();
-        p.setEpsilon(1);
+        p.setEpsilon(epsilon);
         try{
              
             //start TraCI
@@ -84,7 +89,11 @@ public class Main extends JPanel {
 			    			  bT.getStoppedVehiclesAmount(conn,"0Wi") +
 			    			  bT.getStoppedVehiclesAmount(conn,"0Ei") +
 			    			  bT.getStoppedVehiclesAmount(conn,"0Ni");
-                if(fiveSecs == 5){
+			    if(i == 1000){
+			    	epsilon = 0.1;
+			    	p.setEpsilon(epsilon);
+			    }
+                if(fiveSecs == 10){
                 	bT.getEnv().setNsOcc( bT.getOccupancy(conn, "0Ni")+ bT.getOccupancy(conn, "0Si"));
                 	bT.getEnv().setWeOcc( bT.getOccupancy(conn, "0Wi")+ bT.getOccupancy(conn, "0Ei"));
                 	bT.getEnv().setPhase((int)conn.do_job_get(Trafficlight.getPhase("0")));
@@ -97,8 +106,9 @@ public class Main extends JPanel {
                 	Episode e = agent.runLearningEpisode(bT.getEnv(), 1);
                 	bT.makeAction(conn,e.actionString());
                 }
-                else
+                else{
                 	lastStoppedCars = lastStoppedCars - stoppedCars;
+                }
                 stoppedCars = 0;
                 conn.do_timestep();
             }   
