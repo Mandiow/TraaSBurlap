@@ -18,11 +18,11 @@ public class SumoEnvironment implements Environment, EnvironmentServerInterface 
 	 * Reward given for the current action
 	*/
 	private int reward = 0;
-	
+	//Occupancy in the WE
 	private double weOcc;
-	
+	//Occupancy in the NS
 	private double nsOcc;
-	
+	//Which phase is the TL
 	private int phase;
 	
 	/**
@@ -74,25 +74,18 @@ public class SumoEnvironment implements Environment, EnvironmentServerInterface 
 
 	@Override
 	public void addObservers(EnvironmentObserver... observers) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void clearAllObservers() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void removeObservers(EnvironmentObserver... observers) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public List<EnvironmentObserver> observers() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -123,16 +116,21 @@ public class SumoEnvironment implements Environment, EnvironmentServerInterface 
 	@Override
 	public void resetEnvironment() {
 	}
+	/**
+	 * This method have the purpose to get the values of the Occupancy in the lanes and, abstract to a
+	 * LOW,MID or HIGH Traffic, additionaly, it sets, whith the phase passed as argument, which direction
+	 * is open
+	 * */
 	public SumoState makeState(double newWEOcc, double newNSOcc, int newPhase){
 		String nsStatus,weStatus,trafficLight = null;
-		if(newNSOcc < .15)
+		if(newNSOcc < .2)
 			nsStatus = SumoState.LOW_TRAFFIC;
 		else 
 			if(newNSOcc < .45)
 				nsStatus = SumoState.MID_TRAFFIC;
 			else
 				nsStatus = SumoState.HIGH_TRAFFIC;
-		if(newWEOcc < .15)
+		if(newWEOcc < .2)
 			weStatus = SumoState.LOW_TRAFFIC;
 		else 
 			if(newWEOcc < .45)

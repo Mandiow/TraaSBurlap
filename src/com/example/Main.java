@@ -32,19 +32,20 @@ public class Main extends JPanel {
  
     static String sumo_bin = "c:/Program Files (x86)/DLR/Sumo/bin/sumo-gui.exe";
     static String config_file = "c:/Users/Mandiow/Documents/SUMOTRACI/3x3Grid/3x3GridHalfRandom.sumocfg";
-    static int duration = 259200;
+    static int duration = 129600;
 	
     public static void main(String[] args) {
     	//
     	int fiveSecs = 0;
         int stoppedCars = 0;
         int lastStoppedCars = 0;
+        int previousStopped =0;
         double nsOcc;
         double weOcc;
         double gamma = 0.8;
-        double learningRate = 1.;
+        double learningRate = .1;
         double qInit = 0.;
-        double epsilon = 0.7;
+        double epsilon = 1;
         
     	//The user needs to pass their configuration, sumo path and duration
 //        if(args.length > 3 || args.length < 3)
@@ -55,7 +56,7 @@ public class Main extends JPanel {
 //		duration = Integer.parseInt(args[2]);
     	PrintWriter writer = null;
     	try {
-			writer = new PrintWriter("aes.csv", "UTF-8");
+			writer = new PrintWriter("results/different learning rate.csv", "UTF-8");
 			//writer.println("Time,Queue");
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -89,15 +90,16 @@ public class Main extends JPanel {
 			    			  bT.getStoppedVehiclesAmount(conn,"0Wi") +
 			    			  bT.getStoppedVehiclesAmount(conn,"0Ei") +
 			    			  bT.getStoppedVehiclesAmount(conn,"0Ni");
-			    if(i == 1000){
-			    	epsilon = 0.1;
-			    	p.setEpsilon(epsilon);
-			    }
-                if(fiveSecs == 10){
+			   	
+			    if(fiveSecs == 5){
                 	bT.getEnv().setNsOcc( bT.getOccupancy(conn, "0Ni")+ bT.getOccupancy(conn, "0Si"));
                 	bT.getEnv().setWeOcc( bT.getOccupancy(conn, "0Wi")+ bT.getOccupancy(conn, "0Ei"));
                 	bT.getEnv().setPhase((int)conn.do_job_get(Trafficlight.getPhase("0")));
-                	bT.getEnv().setReward(lastStoppedCars/fiveSecs);
+                	int rew = lastStoppedCars/fiveSecs;
+                	if(stoppedCars < previousStopped)
+                		rew *= -1;
+                	bT.getEnv().setReward(rew);
+                	previousStopped = stoppedCars;
                 	lastStoppedCars = stoppedCars;
                 	writer.println(i+","+lastStoppedCars);
                 	fiveSecs = 0;
@@ -105,6 +107,8 @@ public class Main extends JPanel {
                 	//Noticed something awkward, if i set the step to 2, it never learns
                 	Episode e = agent.runLearningEpisode(bT.getEnv(), 1);
                 	bT.makeAction(conn,e.actionString());
+                	epsilon *= .999;
+                	p.setEpsilon(epsilon);
                 }
                 else{
                 	lastStoppedCars = lastStoppedCars - stoppedCars;

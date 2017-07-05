@@ -33,9 +33,12 @@ import de.tudresden.ws.container.SumoStringList;
 import it.polito.appeal.traci.SumoTraciConnection;
 
 public class BurlapTraci {
+	//Single Agent Domain
 	SADomain domain;
 	HashableStateFactory hashingFactory;
+	//A setted enviroment for SUMO
 	SumoEnvironment env;
+	int starvationAvoidance;
 	/***
 	 * 
 	 * @param conn SumoConnection to send the command
@@ -62,7 +65,9 @@ public class BurlapTraci {
 	}
 	
 	public void makeAction(SumoTraciConnection conn, String action) throws Exception{
-		if(action.equals(ChangePhaseActionType.CHANGE_ACTION_NAME)){
+		if(starvationAvoidance > 150)
+			System.out.println(starvationAvoidance);
+		if((starvationAvoidance > 10 && action.equals(ChangePhaseActionType.CHANGE_ACTION_NAME)) || starvationAvoidance > 175){
     		/**
     		 * Phase 0 = W - E Open 1 - 3 
     		 * Phase 2 = N - S Open 0 - 2
@@ -70,26 +75,34 @@ public class BurlapTraci {
     		if((int)conn.do_job_get(Trafficlight.getPhase("0")) == 0){
     			conn.do_job_set(Trafficlight.setPhase("0",1));
     		}
-    		else
+    		else{
     			conn.do_job_set(Trafficlight.setPhase("0",3));
+    		}
+    		starvationAvoidance = 0;
     	}
     	else{
     		if((int)conn.do_job_get(Trafficlight.getPhase("0")) == 0){
     			conn.do_job_set(Trafficlight.setPhase("0",0));
     		}
-    		else
+    		else{
     			conn.do_job_set(Trafficlight.setPhase("0",2));
+    		}
+    		starvationAvoidance +=5;
     	}
 	}
-	
+	/**
+	 * Generate the environment creating a Single Agent domain, Adding our environment
+	 * And adding the possible actions to the domain
+	 * */
     private void generateEnvironment(){
     	domain = new SADomain();
     	domain.addActionTypes(new UniversalActionType(ChangePhaseActionType.CHANGE_ACTION_NAME),
 				new UniversalActionType(KeepPhaseActionType.KEEP_ACTION_NAME));
     	this.hashingFactory = new SimpleHashableStateFactory();
     	env = new SumoEnvironment();
+    	this.starvationAvoidance = 0;
     }
-    
+    //Getter to 
     public SumoEnvironment getEnv() {
 		return env;
 	}
